@@ -41,6 +41,10 @@ on:
         type: string
         default: asia-southeast2-a
 
+      argocd_app:
+        required: true
+        type: string
+
     secrets:
       deployer_app_id:
         required: true
@@ -55,7 +59,7 @@ on:
 jobs:
   deployment:
     name: Deploy
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     environment: ${{ inputs.environment }}
 
     steps:
@@ -75,7 +79,7 @@ jobs:
         with:
           repository: ${{ inputs.repository }}
           token: ${{ steps.generate_token.outputs.token }}
-          path: rhodes
+          path: temp
 
       - name: Set git config
         run: |
@@ -83,13 +87,13 @@ jobs:
           AUTHOR_EMAIL=$(git show -s --format='%ae' ${{ github.sha }})
           git config --global user.name "${AUTHOR_NAME}"
           git config --global user.email "${AUTHOR_EMAIL}"
-      - name: Update service tag in rhodes
+      - name: Update service tag
         uses: nick-invision/retry@v2
         with:
           timeout_seconds: 15
-          max_attempts: 3
+          max_attempts: 6
           command: |
-            cd rhodes/${{ inputs.deployment_directory }}
+            cd temp/${{ inputs.deployment_directory }}
             git fetch origin master
             git reset --hard origin/master
             sed '/app:/,/^[a-zA-Z]/ { s/^    tag: .*/    tag: "'${{ github.sha }}'"/g }' ${{ inputs.deployment_file }} > temp && mv temp ${{ inputs.deployment_file }}
@@ -102,20 +106,20 @@ jobs:
         with:
           service_account_key: ${{ secrets.gke_sa_key }}
           project_id: ${{ inputs.gcp_project_id }}
-          export_default_credentials: true  
+          export_default_credentials: true
 
-      - name: Setup Kubernetes credential
-        run: gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
-      - name: Change kubernetes namespace to `argocd`
-        run: kubectl config set-context --current --namespace=argocd
+      - name: Setup Kubernetes config
+        run: |
+          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
+          kubectl config set-context --current --namespace=argocd
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
         with:
-          command: app sync ${{ inputs.environment }}-backend-${{ inputs.service_name }}
+          command: app sync ${{ inputs.argocd_app }}
           options: --core --async
 
       - name: ArgoCD wait until application healthy
         uses: clowdhaus/argo-cd-action/@main
         with:
-          command: app wait ${{ inputs.environment }}-backend-${{ inputs.service_name }}
+          command: app wait ${{ inputs.argocd_app }}
           options: --core --timeout 300
