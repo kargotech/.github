@@ -106,17 +106,17 @@ jobs:
             git push
 
       # Setup gcloud CLI
-      - name: setup gcloud CLI
-        uses: google-github-actions/setup-gcloud@v0.2.0
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v0
         with:
           service_account_key: ${{ secrets.gke_sa_key }}
           project_id: ${{ inputs.gcp_project_id }}
           export_default_credentials: true
 
-      - name: Setup Kubernetes config
-        run: |
-          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
-          kubectl config set-context --current --namespace=argocd
+      - name: Setup Kubernetes credential
+        run: gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
+      - name: Setup ArgoCD access
+        run: kubectl config set-context --current --namespace=argocd
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
         with:
