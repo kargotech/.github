@@ -68,15 +68,6 @@ jobs:
     environment: ${{ inputs.environment }}
 
     steps:
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@v1
-        with:
-          app_id: ${{ secrets.deployer_app_id }}
-          private_key: ${{ secrets.deployer_private_key }}
-          installation_id: ${{ secrets.deployer_installation_id }}
-          repository: ${{ inputs.repository }}
-
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Checkout deployment repo
