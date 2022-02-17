@@ -113,10 +113,11 @@ jobs:
           project_id: ${{ inputs.gcp_project_id }}
           export_default_credentials: true
 
-      - name: Setup Kubernetes credential
-        run: gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
-      - name: Setup ArgoCD access
-        run: kubectl config set-context --current --namespace=argocd
+      - name: Setup Kubernetes config
+        run: |
+          gcloud components install kubectl
+          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
+          kubectl config set-context --current --namespace=argocd
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
         with:
