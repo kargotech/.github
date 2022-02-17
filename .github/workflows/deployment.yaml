@@ -118,7 +118,7 @@ jobs:
           gcloud info
           gcloud auth list
           gcloud components install kubectl
-          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
+          kubectl get pod -n argocd
           kubectl config set-context --current --namespace=argocd
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
