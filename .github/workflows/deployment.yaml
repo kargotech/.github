@@ -117,8 +117,6 @@ jobs:
         run: |
           gcloud components install kubectl
           echo --------
-          kubectl get pods
-          echo --------
           kubectl get pods -n argocd
           echo --------
           kubectl config view
