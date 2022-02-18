@@ -117,9 +117,13 @@ jobs:
         run: |
           gcloud components install kubectl
           echo --------
-          kubectl config current-context
+          kubectl get pods
+          echo --------
+          kubectl get pods -n argocd
           echo --------
           kubectl config view
+          echo --------
+          kubectl config current-context
           echo --------
           kubectl config set namespace argocd
       - name: ArgoCD sync app
