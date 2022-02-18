@@ -116,6 +116,11 @@ jobs:
       - name: Setup Kubernetes config
         run: |
           gcloud components install kubectl
+          echo --------
+          kubectl config current-context
+          echo --------
+          kubectl config view
+          echo --------
           kubectl config set namespace argocd
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
