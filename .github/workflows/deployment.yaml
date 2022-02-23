@@ -59,7 +59,7 @@ on:
         required: true
 
       gke_sa_key:
-        required: true
+        required: false
 
 jobs:
   deployment:
