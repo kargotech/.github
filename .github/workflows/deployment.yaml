@@ -112,28 +112,16 @@ jobs:
           install_components: kubectl
       - name: Setup Kubernetes config
         run: |
-          echo "==> config kube"
-          # gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
-          echo "==> context set"
-          kubectl config set-context current --namespace=argocd
-          kubectl config use-context current
-          echo "==> list kctl"
-          kubectl get applications -n argocd
-          echo "==> download"
-          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          echo "==> chmod"
-          chmod +x argocd
-          echo "==> list"
-          ./argocd app list --core --loglevel debug
-          echo "==> done"
+          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
+          kubectl config set-context --current --namespace=argocd
 
-      # - name: ArgoCD sync app
-      #   uses: clowdhaus/argo-cd-action/@main
-      #   with:
-      #     command: app sync ${{ inputs.argocd_app }}
-      #     options: --core --async
-      # - name: ArgoCD wait until application healthy
-      #   uses: clowdhaus/argo-cd-action/@main
-      #   with:
-      #     command: app wait ${{ inputs.argocd_app }}
-      #     options: --core --timeout 300
+      - name: ArgoCD sync app
+        uses: clowdhaus/argo-cd-action/@main
+        with:
+          command: app sync ${{ inputs.argocd_app }}
+          options: --core --async
+      - name: ArgoCD wait until application healthy
+        uses: clowdhaus/argo-cd-action/@main
+        with:
+          command: app wait ${{ inputs.argocd_app }}
+          options: --core --timeout 300
