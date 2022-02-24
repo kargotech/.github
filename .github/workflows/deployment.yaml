@@ -115,7 +115,7 @@ jobs:
           echo "==> config kube"
           gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
           echo "==> context set"
-          kubectl config set-context --curent --namespace=argocd
+          kubectl config set-context --current --namespace=argocd
           echo "==> list kctl"
           kubectl get applications -n argocd
           echo "==> download"
