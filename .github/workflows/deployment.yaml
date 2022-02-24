@@ -110,16 +110,19 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0
       - name: Setup Kubernetes config
         run: |
+          echo "==> install kube"
           gcloud components install kubectl
+          echo "==> context set"
           kubectl config set-context current --namespace=argocd
+          echo "==> context use"
           kubectl config use-context current
-          echo ==> download
+          echo "==> download"
           curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          echo ==> chmod
+          echo "==> chmod"
           chmod +x argocd
-          echo ==> list
+          echo "==> list"
           ./argocd app list --core --loglevel debug
-          echo ==> done
+          echo "==> done"
 
       # - name: ArgoCD sync app
       #   uses: clowdhaus/argo-cd-action/@main
