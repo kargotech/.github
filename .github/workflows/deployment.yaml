@@ -116,7 +116,7 @@ jobs:
       - name: Setup Kubernetes config
         run: |
           gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
-          kubectl config set-context current --namespace=argocd
+          kubectl config set-context --current --namespace=argocd
 
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
