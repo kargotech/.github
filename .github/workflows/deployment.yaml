@@ -120,6 +120,8 @@ jobs:
           chmod +x argocd
           echo "==> list"
           ./argocd app list --core --loglevel debug
+          echo "==> sync"
+          ./argocd app sync ${{ inputs.argocd_app }} --core --async --loglevel debug
           echo "==> done"
 
       - name: ArgoCD sync app
