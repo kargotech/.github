@@ -108,14 +108,14 @@ jobs:
       # Setup gcloud CLI
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v0
+        with:
+          install_components: kubectl
       - name: Setup Kubernetes config
         run: |
-          echo "==> install kube"
-          gcloud components install kubectl
+          echo "==> config kube"
+          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
           echo "==> context set"
-          kubectl config set-context current --namespace=argocd
-          echo "==> context use"
-          kubectl config use-context current
+          kubectl config set-context --curent --namespace=argocd
           echo "==> list kctl"
           kubectl get applications -n argocd
           echo "==> download"
