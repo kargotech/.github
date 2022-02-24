@@ -79,12 +79,13 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Checkout deployment repo
         uses: actions/checkout@v2
         with:
           repository: ${{ inputs.repository }}
           token: ${{ steps.generate_token.outputs.token }}
-          path: temp
+          path: deployment-repo
 
       - name: Set git config
         run: |
@@ -92,13 +93,14 @@ jobs:
           AUTHOR_EMAIL=$(git show -s --format='%ae' ${{ github.sha }})
           git config --global user.name "${AUTHOR_NAME}"
           git config --global user.email "${AUTHOR_EMAIL}"
+    
       - name: Update service tag
         uses: nick-invision/retry@v2
         with:
           timeout_seconds: 15
           max_attempts: 6
           command: |
-            cd temp/${{ inputs.deployment_directory }}
+            cd deployment-repo/${{ inputs.deployment_directory }}
             git fetch origin master
             git reset --hard origin/master
             sed '/app:/,/^[a-zA-Z]/ { s/^    tag: .*/    tag: "'${{ github.sha }}'"/g }' ${{ inputs.deployment_file }} > temp && mv temp ${{ inputs.deployment_file }}
@@ -108,11 +110,13 @@ jobs:
       # Setup gcloud CLI
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v0
+        with:
+          install_components: kubectl
+  
       - name: Setup Kubernetes config
         run: |
-          gcloud components install kubectl
+          gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
           kubectl config set-context current --namespace=argocd
-          kubectl config use-context current
 
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
