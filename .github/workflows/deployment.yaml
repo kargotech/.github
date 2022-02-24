@@ -114,6 +114,13 @@ jobs:
         run: |
           gcloud container clusters get-credentials "${{ inputs.gke_cluster }}" --zone "${{ inputs.gke_zone }}"
           kubectl config set-context --current --namespace=argocd
+          echo "==> download"
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          echo "==> chmod"
+          chmod +x argocd
+          echo "==> list"
+          ./argocd app list --core --loglevel debug
+          echo "==> done"
 
       - name: ArgoCD sync app
         uses: clowdhaus/argo-cd-action/@main
