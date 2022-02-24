@@ -113,9 +113,13 @@ jobs:
           gcloud components install kubectl
           kubectl config set-context current --namespace=argocd
           kubectl config use-context current
+          echo ==> download
           curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          echo ==> chmod
           chmod +x argocd
-          ./argocd app list --core
+          echo ==> list
+          ./argocd app list --core --loglevel debug
+          echo ==> done
 
       # - name: ArgoCD sync app
       #   uses: clowdhaus/argo-cd-action/@main
