@@ -1,0 +1,48 @@
+name: Sync Claude Workflows
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'caller-templates/**'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync caller workflows to all org repos
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          repos=$(gh repo list kargotech --limit 1000 --json nameWithOwner -q '.[].nameWithOwner' | grep -v 'kargotech/.github')
+
+          for repo in $repos; do
+            echo "::group::Syncing to $repo"
+
+            for template in claude claude-code-review; do
+              FILE="caller-templates/${template}.yml"
+              DEST=".github/workflows/${template}.yml"
+              CONTENT=$(base64 -w 0 "$FILE")
+              SHA=$(gh api "repos/$repo/contents/$DEST" -q '.sha' 2>/dev/null || echo "")
+
+              if [ -n "$SHA" ]; then
+                gh api "repos/$repo/contents/$DEST" \
+                  -X PUT \
+                  -f message="chore: sync ${template} workflow from kargotech/.github" \
+                  -f content="$CONTENT" \
+                  -f sha="$SHA" \
+                  --silent && echo "Updated $DEST in $repo" || echo "Failed to update $DEST in $repo"
+              else
+                gh api "repos/$repo/contents/$DEST" \
+                  -X PUT \
+                  -f message="chore: add ${template} workflow from kargotech/.github" \
+                  -f content="$CONTENT" \
+                  --silent && echo "Created $DEST in $repo" || echo "Failed to create $DEST in $repo"
+              fi
+            done
+
+            echo "::endgroup::"
+          done
