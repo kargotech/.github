@@ -22,7 +22,7 @@ jobs:
           for repo in $repos; do
             echo "::group::Syncing to $repo"
 
-            for template in claude claude-code-review; do
+            for template in claude claude-code-review auto-claude-review; do
               FILE="caller-templates/${template}.yml"
               DEST=".github/workflows/${template}.yml"
               CONTENT=$(base64 -w 0 "$FILE")
