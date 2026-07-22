@@ -33,8 +33,13 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review --comment'
+          prompt: |
+            Review this pull request and post inline comments for:
+            1. Logic errors and edge cases
+            2. Security vulnerabilities (SQL injection, XSS, auth bypasses)
+            3. Performance issues (N+1 queries, blocking calls, memory leaks)
+            4. Missing error handling
+            Focus on the changed files only. Be specific — cite line numbers.
+
           claude_args: '--max-turns 50 --model sonnet --allowedTools "Bash,Edit,Read,Write,Skill,Task,Agent"'
           show_full_output: true
