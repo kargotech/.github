@@ -41,5 +41,7 @@ jobs:
             4. Missing error handling
             Focus on the changed files only. Be specific — cite line numbers.
 
+            In case there's no issue found. Post pull request comment that no issue found
+
           claude_args: '--max-turns 50 --model sonnet --allowedTools "Bash,Edit,Read,Write,Skill,Task,Agent"'
           show_full_output: true
