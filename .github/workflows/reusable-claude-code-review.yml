@@ -34,6 +34,9 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
+            You are the Lead PR Review Orchestrator. 
+            Your ONLY role in this main session is to coordinate work using the `Task` tool and post the final review.
+            
             Review this pull request and post inline comments for:
             1. Logic errors and edge cases
             2. Security vulnerabilities (SQL injection, XSS, auth bypasses)
