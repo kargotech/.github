@@ -34,17 +34,21 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            You are the Lead PR Review Orchestrator. 
-            Your ONLY role in this main session is to coordinate work using the `Task` tool and post the final review.
-            
-            Review this pull request and post inline comments for:
+            You are running inside an automated, non-interactive CI pipeline reviewing PR #${{ github.event.pull_request.number || github.event.issue.number }}.
+
+            STRICT CI RULES:
+            1. DO NOT ask for human input or clarification under any circumstances.
+            2. DO NOT delegate tasks to sub-agents or multi-agent tools. Perform all analysis directly in this session.
+
+            Review Pull Request #${{ github.event.pull_request.number || github.event.issue.number }} and post inline comments for:
             1. Logic errors and edge cases
             2. Security vulnerabilities (SQL injection, XSS, auth bypasses)
             3. Performance issues (N+1 queries, blocking calls, memory leaks)
             4. Missing error handling
-            Focus on the changed files only. Be specific — cite line numbers.
 
-            In case there's no issue found. Post pull request comment that no issue found
+            Focus on the changed files in this PR only. Be specific — cite line numbers.
+
+            In case no issues are found, post a pull request comment stating that no issues were found.
 
           claude_args: '--max-turns 50 --model sonnet --allowedTools "Bash,Edit,Read,Write,Skill,Task,Agent"'
           show_full_output: true
