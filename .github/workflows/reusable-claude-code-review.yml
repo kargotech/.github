@@ -10,6 +10,8 @@ jobs:
   claude-review:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      ANTHROPIC_BASE_URL: ${{ secrets.CLAUDE_CODE_ANTHROPIC_BASE_URL }}
 
     concurrency:
       group: claude-review-${{ github.event.issue.number || github.event.pull_request.number }}
@@ -32,7 +34,7 @@ jobs:
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.CLAUDE_CODE_ANTHROPIC_API_KEY }}
           prompt: |
             You are running inside an automated, non-interactive CI pipeline reviewing PR #${{ github.event.pull_request.number || github.event.issue.number }}.
 
@@ -51,4 +53,4 @@ jobs:
             In case no issues are found, post a pull request comment stating that no issues were found.
 
           claude_args: '--max-turns 50 --model sonnet --allowedTools "Bash,Edit,Read,Write,Skill,Task,Agent"'
-          show_full_output: true
+          show_full_output: false
