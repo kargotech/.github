@@ -3,7 +3,9 @@ name: Claude Code Review (Reusable)
 on:
   workflow_call:
     secrets:
-      ANTHROPIC_API_KEY:
+      CLAUDE_CODE_ANTHROPIC_BASE_URL:
+        required: true
+      CLAUDE_CODE_ANTHROPIC_API_KEY:
         required: true
 
 jobs:
